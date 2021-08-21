@@ -24,5 +24,10 @@ namespace GhostInTheCellAI.Models
         public int Production { get; set; }
         public int Cyborgs { get; set; }
         public Owner Owner { get; set; }
+
+        public override string ToString()
+        {
+            return $"FACTORY Id = {Id}, Owner = {Owner}, Links = {Links.Count}, Production = {Production}, Cyborgs = {Cyborgs}";
+        }
     }
 }

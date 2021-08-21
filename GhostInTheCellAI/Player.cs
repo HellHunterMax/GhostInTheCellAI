@@ -11,7 +11,8 @@ namespace GhostInTheCellAI
     {
         static void Main(string[] args)
         {
-            
+            AI ai = new AI();
+            ai.Run();
         }
     }
 }

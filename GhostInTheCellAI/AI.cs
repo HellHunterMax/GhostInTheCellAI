@@ -9,6 +9,7 @@ namespace GhostInTheCellAI
     {
         private List<Factory> Factories = new List<Factory>();
         private string[] _Inputs;
+        //TODO add remaining turns into calculation.
 
         public AI()
         {
@@ -37,6 +38,7 @@ namespace GhostInTheCellAI
                         troops.Add(
                             new Troop()
                             {
+                                Id = entityId,
                                 Owner = (Owner)int.Parse(_Inputs[2]),
                                 Source = Factories.First((fac => fac.Id == int.Parse(_Inputs[3]))),
                                 Destination = Factories.First((fac => fac.Id == int.Parse(_Inputs[4]))),
@@ -46,14 +48,81 @@ namespace GhostInTheCellAI
                     }
                 }
 
-                // Write an action using Console.WriteLine()
+                string action = CalculateBestAction(troops);
                 // To debug: Console.Error.WriteLine("Debug messages...");
 
 
-                // Any valid action, such as "WAIT" or "MOVE source destination cyborgs"
-                Console.WriteLine("WAIT");
+                // Write an action using Console.WriteLine() Any valid action, such as "WAIT" or "MOVE source destination cyborgs"
+                Console.WriteLine(action);
             }
         }
+
+        private string CalculateBestAction(List<Troop> troops)
+        {
+            //TODO Find best action to take 1 step at a time.
+            //TODO create Points System
+            /*
+             * source troops - destination troops - TTA * production
+             * 60 3 10 * 3 = 141
+             * 60 10 2 * 1 = 48
+             * first step find closest takeover. base TTA.
+             * 
+             * (if enemy) source troops - (destination troops + (TTA * Produciton))
+             */
+            //TODO add troops to possibletakeovers
+            //TODO step2 Choose best one.
+            string action = "WAIT";
+
+            List<Factory> ownedFactories = Factories.FindAll(fac => fac.Owner == Owner.Player);
+            Dictionary<Factory, List<Factory>> possibleTakeOvers = FindPossibleTakeOvers(ownedFactories);
+            if (possibleTakeOvers.Count < 1)
+            {
+                return action;
+            }
+
+            return action;
+        }
+
+        private static Dictionary<Factory, List<Factory>> FindPossibleTakeOvers(List<Factory> ownedFactories)
+        {
+            Dictionary<Factory, List<Factory>> possibleTakeOvers = new Dictionary<Factory, List<Factory>>();
+            for (int i = 0; i < ownedFactories.Count; i++)
+            {
+                Factory factory = ownedFactories[i];
+                int numberOfLinks = factory.Links.Count;
+
+                List<Factory> possibleDestinations = new List<Factory>();
+                for (int links = 0; links < numberOfLinks; links++)
+                {
+                    Factory destinationFactory = GetDestinationFactory(factory, links);
+                    if (factory.Cyborgs > destinationFactory.Cyborgs)
+                    {
+                        possibleDestinations.Add(destinationFactory);
+                    }
+                }
+                if (possibleDestinations.Count > 0)
+                {
+                    possibleTakeOvers.Add(factory, possibleDestinations);
+                }
+            }
+            return possibleTakeOvers;
+        }
+
+        private static Factory GetDestinationFactory(Factory factory, int links)
+        {
+            Factory destinationFactory;
+            if (factory.Links[links].Factory1.Id == factory.Id)
+            {
+                destinationFactory = factory.Links[links].Factory2;
+            }
+            else
+            {
+                destinationFactory = factory.Links[links].Factory1;
+            }
+
+            return destinationFactory;
+        }
+
         private void UpdateFactory(Factory factory)
         {
             factory.Owner = (Owner)int.Parse(_Inputs[2]);
@@ -63,7 +132,7 @@ namespace GhostInTheCellAI
 
         private void BuildFactories()
         {
-            int factoryCount = int.Parse(Console.ReadLine()); // the number of factories
+            int factoryCount = int.Parse(Console.ReadLine());
 
             for (int i = 0; i < factoryCount; i++)
             {

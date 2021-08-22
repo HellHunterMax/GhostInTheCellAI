@@ -25,6 +25,7 @@ namespace GhostInTheCellAI
             while (true)
             {
                 List<Troop> troops = new List<Troop>();
+                List<Bomb> bombs = new List<Bomb>();
                 int entityCount = int.Parse(Console.ReadLine()); // the number of entities (e.g. factories and troops)
                 for (int i = 0; i < entityCount; i++)
                 {
@@ -47,6 +48,19 @@ namespace GhostInTheCellAI
                                 Destination = Factories.First((fac => fac.Id == int.Parse(_Inputs[4]))),
                                 Size = int.Parse(_Inputs[5]),
                                 TurnsToArrive = int.Parse(_Inputs[6])
+                            });
+                    }
+                    else if (entityType == "BOMB")
+                    {
+                        int destination = int.Parse(_Inputs[4]);
+                        bombs.Add(
+                            new Bomb()
+                            {
+                                Id = entityId,
+                                Owner = (Owner)int.Parse(_Inputs[2]),
+                                Source = Factories.First((fac => fac.Id == int.Parse(_Inputs[3]))),
+                                Destination = Factories.FirstOrDefault((fac => fac.Id == int.Parse(_Inputs[4]))),
+                                TurnsToArrive = int.Parse(_Inputs[5])
                             });
                     }
                 }

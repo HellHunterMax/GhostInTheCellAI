@@ -87,23 +87,24 @@ namespace GhostInTheCellAI
             {
                 if (bombTarget != null)
                 {
-                    action = $"BOMB {ownedFactories[0].Id} {bombTarget.Id}";  
+                    action = $"BOMB {ownedFactories[0].Id} {bombTarget.Id}";
                 }
                 return action;
             }
 
             Factory[] sourceAndDestination = GetBestTakeOver(possibleTakeOvers);
-            
+
             if (sourceAndDestination[0] == null)
             {
-                
+
                 sourceAndDestination = FindClosestFactoryToEnemy(ownedFactories);
                 Console.Error.WriteLine($"sourceAndDestination Length = {sourceAndDestination.Length}, sourceAndDestination = {sourceAndDestination.FirstOrDefault()}");
             }
 
-
-            //MOVE source destination cyborgCount
-            action = $"MOVE {sourceAndDestination[0].Id} {sourceAndDestination[1].Id} {sourceAndDestination[1].Cyborgs + 1}";
+            if (sourceAndDestination[0] != null)
+            {
+                action = $"MOVE {sourceAndDestination[0].Id} {sourceAndDestination[1].Id} {sourceAndDestination[1].Cyborgs + 1}";
+            }
 
             Factory bombSource = FindBombSource(sourceAndDestination[0], ownedFactories);
             if (bombTarget != null && bombSource != null)
@@ -123,7 +124,7 @@ namespace GhostInTheCellAI
                     return targetFactory;
                 }
             }
-            
+
             return null;
         }
 
@@ -161,6 +162,7 @@ namespace GhostInTheCellAI
                     }
                 }
             }
+            Console.Error.WriteLine($"source = {source}, destination = {destination}");
             return new Factory[] { source, destination };
         }
 

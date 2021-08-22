@@ -11,7 +11,6 @@ namespace GhostInTheCellAI
         private string[] _Inputs;
         private int _RemainingBombs = 2;
         //TODO add remaining turns into calculation.
-        //TODO add caluclation to Enemy factories production. !!!!!!!!!
         // To debug: Console.Error.WriteLine("Debug messages...");
 
         public AI()

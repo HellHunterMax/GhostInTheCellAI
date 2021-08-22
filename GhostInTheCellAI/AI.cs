@@ -9,10 +9,10 @@ namespace GhostInTheCellAI
     {
         private readonly List<Factory> Factories = new List<Factory>();
         private string[] _Inputs;
+        private int _RemainingBombs = 2;
         //TODO add remaining turns into calculation.
-        //TODO Add minuspoints for own owned factories.
-        //TODO push Cyborgs to closest to enemy.
-        //TODO Dont send more units then units in factory.
+        //TODO add caluclation to Enemy factories production.
+        // To debug: Console.Error.WriteLine("Debug messages...");
 
         public AI()
         {
@@ -66,36 +66,125 @@ namespace GhostInTheCellAI
                 }
 
                 string action = CalculateBestAction(troops);
-                // To debug: Console.Error.WriteLine("Debug messages...");
 
-
-                // Write an action using Console.WriteLine() Any valid action, such as "WAIT" or "MOVE source destination cyborgs"
                 Console.WriteLine(action);
             }
         }
 
+        //TODO split the calculate best action so you can get multiple actions.
         private string CalculateBestAction(List<Troop> troops)
         {
-            //TODO add troops to possibletakeovers
-            //TODO Add remove 0 production factories from possibletakeovers except opponants.
             string action = "WAIT";
 
             List<Factory> ownedFactories = Factories.FindAll(fac => fac.Owner == Owner.Player);
             Dictionary<Factory, Dictionary<Factory, int>> possibleTakeOvers = FindPossibleTakeOvers(ownedFactories);
+            Factory bombTarget = null;
+            if (_RemainingBombs > 0)
+            {
+                bombTarget = FindBombTarget();
+            }
             if (possibleTakeOvers.Count < 1)
             {
+                if (bombTarget != null)
+                {
+                    action = $"BOMB {ownedFactories[0].Id} {bombTarget.Id}";  
+                }
                 return action;
             }
 
-            Factory[] sourceAndDestination = FindSourceAndDestination(possibleTakeOvers);
+            Factory[] sourceAndDestination = GetBestTakeOver(possibleTakeOvers);
+            
+            if (sourceAndDestination[0] == null)
+            {
+                
+                sourceAndDestination = FindClosestFactoryToEnemy(ownedFactories);
+                Console.Error.WriteLine($"sourceAndDestination Length = {sourceAndDestination.Length}, sourceAndDestination = {sourceAndDestination.FirstOrDefault()}");
+            }
 
 
             //MOVE source destination cyborgCount
             action = $"MOVE {sourceAndDestination[0].Id} {sourceAndDestination[1].Id} {sourceAndDestination[1].Cyborgs + 1}";
+
+            Factory bombSource = FindBombSource(sourceAndDestination[0], ownedFactories);
+            if (bombTarget != null && bombSource != null)
+            {
+                action += $";BOMB {sourceAndDestination[0].Id} {bombTarget.Id}";
+                _RemainingBombs--;
+            }
             return action;
         }
 
-        private static Factory[] FindSourceAndDestination(Dictionary<Factory, Dictionary<Factory, int>> possibleTakeOvers)
+        private static Factory FindBombSource(Factory factory, List<Factory> ownedFactories)
+        {
+            foreach (var targetFactory in ownedFactories)
+            {
+                if (targetFactory != factory)
+                {
+                    return targetFactory;
+                }
+            }
+            
+            return null;
+        }
+
+        private static Factory[] FindClosestFactoryToEnemy(List<Factory> ownedFactories)
+        {
+            Factory source = null;
+            Factory destination = null;
+            int distance = int.MaxValue;
+
+            foreach (var factory in ownedFactories)
+            {
+                for (int linkNumber = 0; linkNumber < factory.Links.Count; linkNumber++)
+                {
+                    Factory destinationFactory = GetDestinationFactory(factory, linkNumber);
+                    if (destinationFactory.Owner == Owner.Enemy)
+                    {
+                        if (destination == null)
+                        {
+                            source = factory;
+                            destination = destinationFactory;
+                            distance = factory.Links[linkNumber].Distance;
+                        }
+                        if (factory.Links[linkNumber].Distance == distance && destinationFactory.Production > destination.Production)
+                        {
+                            source = factory;
+                            destination = destinationFactory;
+                            distance = factory.Links[linkNumber].Distance;
+                        }
+                        else if (factory.Links[linkNumber].Distance < distance && destinationFactory.Production >= destination.Production)
+                        {
+                            source = factory;
+                            destination = destinationFactory;
+                            distance = factory.Links[linkNumber].Distance;
+                        }
+                    }
+                }
+            }
+            return new Factory[] { source, destination };
+        }
+
+        private Factory FindBombTarget()
+        {
+            Factory target = null;
+            foreach (var factory in Factories)
+            {
+                if (factory.Owner == Owner.Enemy)
+                {
+                    if (target == null && factory.Production > 0 && factory.Cyborgs > 0)
+                    {
+                        target = factory;
+                    }
+                    else if (target != null && factory.Production > 0 && factory.Cyborgs > target.Cyborgs)
+                    {
+                        target = factory;
+                    }
+                }
+            }
+            return target;
+        }
+
+        private static Factory[] GetBestTakeOver(Dictionary<Factory, Dictionary<Factory, int>> possibleTakeOvers)
         {
             Factory source = null;
             Factory destination = null;
@@ -110,17 +199,23 @@ namespace GhostInTheCellAI
                     //Console.Error.WriteLine($"new = {newFactoryDestinationAndDistance.Key}");
                     if (factoryDestinationAndDistance.Key == null)
                     {
-                        source = FactorySourceAndFactoryDest.Key;
-                        factoryDestinationAndDistance = newFactoryDestinationAndDistance;
-                        destination = factoryDestinationAndDistance.Key;
+                        if (newFactoryDestinationAndDistance.Key.Owner != Owner.Player)
+                        {
+                            source = FactorySourceAndFactoryDest.Key;
+                            factoryDestinationAndDistance = newFactoryDestinationAndDistance;
+                            destination = factoryDestinationAndDistance.Key;
+                        }
                     }
                     else
                     {
                         if (!IsCurrentTargetBest(source.Cyborgs, newSource.Cyborgs, factoryDestinationAndDistance, newFactoryDestinationAndDistance))
                         {
-                            source = newSource;
-                            factoryDestinationAndDistance = newFactoryDestinationAndDistance;
-                            destination = newFactoryDestinationAndDistance.Key;
+                            if (newFactoryDestinationAndDistance.Key.Owner != Owner.Player)
+                            {
+                                source = newSource;
+                                factoryDestinationAndDistance = newFactoryDestinationAndDistance;
+                                destination = newFactoryDestinationAndDistance.Key;
+                            }
                         }
                     }
                 }
@@ -129,6 +224,8 @@ namespace GhostInTheCellAI
             return factories;
         }
 
+
+        //TODO Add minuspoints for own owned factories. Removed for now.
         private static bool IsCurrentTargetBest(int cyborgsCurrent, int cyborgsChallenger, KeyValuePair<Factory, int> CurrentFactoryAndDistance, KeyValuePair<Factory, int> ChallengerFactoryAndDistance)
         {
             bool currentIsClosest = CurrentFactoryAndDistance.Value <= ChallengerFactoryAndDistance.Value;
@@ -166,10 +263,11 @@ namespace GhostInTheCellAI
             bool isScore1More = score1 >= score2;
             bool answer = currentIsClosest ? isScore1More : !isScore1More;
 
-            Console.Error.WriteLine(answer);
+            //Console.Error.WriteLine(answer);
             return answer;
         }
 
+        //TODO add troops to possibletakeovers
         private static Dictionary<Factory, Dictionary<Factory, int>> FindPossibleTakeOvers(List<Factory> ownedFactories)
         {
             Dictionary<Factory, Dictionary<Factory, int>> possibleTakeOvers = new Dictionary<Factory, Dictionary<Factory, int>>();
@@ -177,16 +275,16 @@ namespace GhostInTheCellAI
             {
                 Factory factory = ownedFactories[i];
                 int numberOfLinks = factory.Links.Count;
-                Console.Error.WriteLine($"Owned factory = {factory}");
+                //Console.Error.WriteLine($"Owned factory = {factory}");
 
                 Dictionary<Factory, int> possibleDestinations = new Dictionary<Factory, int>();
                 for (int links = 0; links < numberOfLinks; links++)
                 {
                     Factory destinationFactory = GetDestinationFactory(factory, links);
-                    if (factory.Cyborgs > destinationFactory.Cyborgs)
+                    if (factory.Cyborgs > destinationFactory.Cyborgs && (destinationFactory.Production != 0 || destinationFactory.Owner != Owner.Enemy))
                     {
                         possibleDestinations.Add(destinationFactory, factory.Links[links].Distance);
-                        Console.Error.WriteLine($"Possible Destination = {destinationFactory}");
+                        //Console.Error.WriteLine($"Possible Destination = {destinationFactory}");
                     }
                 }
                 if (possibleDestinations.Count > 0)
@@ -197,19 +295,10 @@ namespace GhostInTheCellAI
             return possibleTakeOvers;
         }
 
-        private static Factory GetDestinationFactory(Factory factory, int links)
+        private static Factory GetDestinationFactory(Factory factory, int linknumber)
         {
-            Factory destinationFactory;
-            if (factory.Links[links].Factory1.Id == factory.Id)
-            {
-                destinationFactory = factory.Links[links].Factory2;
-            }
-            else
-            {
-                destinationFactory = factory.Links[links].Factory1;
-            }
 
-            return destinationFactory;
+            return factory.Links[linknumber].Factory1.Id == factory.Id ? factory.Links[linknumber].Factory2 : factory.Links[linknumber].Factory1;
         }
 
         private void UpdateFactory(Factory factory)

@@ -11,7 +11,7 @@ namespace GhostInTheCellAI
         private string[] _Inputs;
         private int _RemainingBombs = 2;
         //TODO add remaining turns into calculation.
-        //TODO add caluclation to Enemy factories production.
+        //TODO add caluclation to Enemy factories production. !!!!!!!!!
         // To debug: Console.Error.WriteLine("Debug messages...");
 
         public AI()
@@ -101,9 +101,28 @@ namespace GhostInTheCellAI
                 Console.Error.WriteLine($"sourceAndDestination Length = {sourceAndDestination.Length}, sourceAndDestination = {sourceAndDestination.FirstOrDefault()}");
             }
 
-            if (sourceAndDestination[0] != null)
+
+            int numberOfCyborgs = 0;
+            if (sourceAndDestination[0] != null && sourceAndDestination[1] != null)
             {
-                action = $"MOVE {sourceAndDestination[0].Id} {sourceAndDestination[1].Id} {sourceAndDestination[1].Cyborgs + 1}";
+                Factory source = sourceAndDestination[0];
+                Factory destination = sourceAndDestination[1];
+                if (sourceAndDestination[1].Owner == Owner.Enemy)
+                {
+                    
+                    foreach (var link in source.Links)
+                    {
+                        if(link.Contains(source, destination))
+                        {
+                            numberOfCyborgs = destination.Production * link.Distance + destination.Cyborgs + 1;
+                        }
+                    }
+                }
+                else
+                {
+                    numberOfCyborgs = destination.Cyborgs + 1;
+                }
+                action = $"MOVE {source.Id} {destination.Id} {destination.Cyborgs + 1}";
             }
 
             Factory bombSource = FindBombSource(sourceAndDestination[0], ownedFactories);
@@ -283,7 +302,16 @@ namespace GhostInTheCellAI
                 for (int links = 0; links < numberOfLinks; links++)
                 {
                     Factory destinationFactory = GetDestinationFactory(factory, links);
-                    if (factory.Cyborgs > destinationFactory.Cyborgs && (destinationFactory.Production != 0 || destinationFactory.Owner != Owner.Enemy))
+                    int destinationCyborgs;
+                    if (destinationFactory.Owner == Owner.Enemy)
+                    {
+                        destinationCyborgs = destinationFactory.Cyborgs + (destinationFactory.Production * factory.Links[links].Distance);
+                    }
+                    else
+                    {
+                        destinationCyborgs = destinationFactory.Cyborgs;
+                    }
+                    if (factory.Cyborgs > destinationCyborgs && (destinationFactory.Production != 0 || destinationFactory.Owner != Owner.Enemy))
                     {
                         possibleDestinations.Add(destinationFactory, factory.Links[links].Distance);
                         //Console.Error.WriteLine($"Possible Destination = {destinationFactory}");

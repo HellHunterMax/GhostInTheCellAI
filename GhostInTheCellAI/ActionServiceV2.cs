@@ -68,15 +68,24 @@ namespace GhostInTheCellAI
             fac.Production = 0;
         }
 
+
+        //TODO change factory owner to who is owner with amount of cyborgs.
         private static void AddTroopsToFactory(List<Factory> updatedFactories, Troop troop)
         {
+            var factory = updatedFactories.First(x => x.Id == troop.Destination.Id);
+
             if (troop.Source.Owner == troop.Destination.Owner)
             {
-                updatedFactories.First(x => x.Id == troop.Destination.Id).Cyborgs += troop.Size;
+                factory.Cyborgs += troop.Size;
             }
             else
             {
-                updatedFactories.First(x => x.Id == troop.Destination.Id).Cyborgs -= troop.Size;
+                factory.Cyborgs -= troop.Size;
+                if (factory.Cyborgs < 0)
+                {
+                    factory.Owner = troop.Source.Owner;
+                    factory.Cyborgs = Math.Abs(factory.Cyborgs);
+                }
             }
         }
 

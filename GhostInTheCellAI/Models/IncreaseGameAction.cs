@@ -38,14 +38,14 @@ namespace GhostInTheCellAI.Models
             };
             Score = closestDistance * prod;
         }
+
         public override string ToString()
         {
-            return $"{Name()} Source={Source.Id} Score={Score} Distance={Distance}";
+            return $"{Name()} {Source.Id}";
         }
-
         public override string WriteAction()
         {
-            return $"{Name()} {Source.Id}";
+            return $"{Name()} Source={Source.Id} Score={Score} Distance={Distance}";
         }
     }
 }

@@ -3,7 +3,7 @@
     public class BombMoveGameAction : GameAction
     {
         public override string Name() => "BOMB";
-        public Factory Destination { get; init; }
+        public Factory Destination { get; private set; }
 
         public BombMoveGameAction(Factory source, Factory destination, int distance)
         {
@@ -19,12 +19,11 @@
 
         public override string ToString()
         {
-            return $"{Name()} Source={Source.Id} Destination={Destination.Id} Score={Score} Distance={Distance}";
+            return $"{Name()} {Source} {Destination}";
         }
-
         public override string WriteAction()
         {
-            return $"{Name()} {Source} {Destination}";
+            return $"{Name()} Source={Source.Id} Destination={Destination.Id} Score={Score} Distance={Distance}";
         }
     }
 }

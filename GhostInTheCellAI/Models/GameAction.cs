@@ -8,8 +8,8 @@ namespace GhostInTheCellAI.Models
 {
     public abstract class GameAction
     {
-        public Factory Source { get; init; }
-        public int Distance { get; init; }
+        public Factory Source { get; protected set; }
+        public int Distance { get; protected set; }
         public int Score { get; set; }
         public abstract string Name();
 

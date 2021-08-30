@@ -10,7 +10,7 @@ namespace GhostInTheCellAI.Models
     {
 
         public int Cyborgs { get; set; }
-        public Factory Destination { get; init; }
+        public Factory Destination { get; private set; }
 
         public override string Name() => "MOVE";
 
@@ -26,11 +26,6 @@ namespace GhostInTheCellAI.Models
         private void GiveScore()
         {
             Score = ((Destination.Production * 100) / Distance ) + Source.Cyborgs - Destination.Cyborgs;
-        }
-
-        public override string ToString()
-        {
-            return $"{Name()} Source={Source.Id} Destination={Destination.Id} Cyborgs={Cyborgs} Score={Score} Distance={Distance}";
         }
 
         public bool IsPossible()
@@ -72,9 +67,13 @@ namespace GhostInTheCellAI.Models
             }
         }
 
-        public override string WriteAction()
+        public override string ToString()
         {
             return $"{Name()} {Source.Id} {Destination.Id} {Cyborgs}";
+        }
+        public override string WriteAction()
+        {
+            return $"{Name()} Source={Source.Id} Destination={Destination.Id} Cyborgs={Cyborgs} Score={Score} Distance={Distance}";
         }
     }
 }

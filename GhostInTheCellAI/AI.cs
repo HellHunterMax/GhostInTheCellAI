@@ -33,10 +33,6 @@ namespace GhostInTheCellAI
                 {
                     Console.Error.WriteLine(factory);
                 }
-                foreach (var a in actions)
-                {
-                    Console.Error.WriteLine(a);
-                }
                 cyborgActions.Sort(delegate (MoveGameAction action1, MoveGameAction action2) { return action1.Score.CompareTo(action2.Score); });
 
                 foreach (var cyborgAction in cyborgActions)
@@ -46,6 +42,11 @@ namespace GhostInTheCellAI
                         actions.Add(cyborgAction);
                         cyborgAction.PlayOut();
                     }
+                }
+
+                foreach (var a in actions)
+                {
+                    Console.Error.WriteLine(a.WriteAction());
                 }
                 //TODO BombAction
                 //TODO Increaseroduction Action

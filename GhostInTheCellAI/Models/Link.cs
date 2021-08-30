@@ -12,6 +12,8 @@ namespace GhostInTheCellAI.Models
         public Factory Factory2 { get; set; }
         public int Distance { get; set; }
 
+        public Factory Other(Factory factory) => Factory1 == factory ? Factory2 : Factory1;
+
         public bool Contains(Factory factory1, Factory factory2)
         {
             return (Factory1 == factory1 || Factory2 == factory1) && (Factory1 == factory2 || Factory2 == factory2);

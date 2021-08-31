@@ -7,11 +7,12 @@ namespace GhostInTheCellAI
 {
     public class ActionServiceV2
     {
+        private List<Factory> updatedFactories;
         public List<MoveGameAction> GetPossibleCyborgActions(Game game)
         {
             // Things ot take into account:
             // 4. think about TTA of troops.
-            List<Factory> updatedFactories = GetUpDatedFactoriesWithTroopsAtDestinationAndBombsSent(game);
+            updatedFactories = GetUpDatedFactoriesWithTroopsAtDestinationAndBombsSent(game);
             List<MoveGameAction> gameActions = FindPossibleTakeOvers(updatedFactories, game);
 
             return gameActions;
@@ -62,6 +63,52 @@ namespace GhostInTheCellAI
             {
                 fac.Cyborgs -= 10;
             }
+        }
+
+        internal GameAction GetBombAction(Game game, List<Factory> unavailableFactories)
+        {
+            List<BombGameAction> actions = new List<BombGameAction>();
+            List<Factory> PossibleSource = new List<Factory>();
+            foreach (var factory in game.Factories)
+            {
+                if (factory.Owner == Owner.Player && !unavailableFactories.Any(f => f.Id == factory.Id))
+                {
+                    PossibleSource.Add(factory);
+                }
+            }
+
+            if (!PossibleSource.Any())
+            {
+                return null;
+            }
+
+            foreach (var factory in updatedFactories)
+            {
+                if (factory.Owner == Owner.Enemy && factory.Cyborgs > 20 && factory.Production >1)
+                {
+                    Factory source = PossibleSource[0];
+                    int distance = int.MaxValue;
+                    foreach (var sourceFactory in PossibleSource)
+                    {
+                        for (int links = 0; links < sourceFactory.Links.Count; links++)
+                        {
+                            Factory destinationFactory = updatedFactories.First(F => F.Id == GetDestinationFactory(factory, links).Id);
+                            if (destinationFactory == factory)
+                            {
+                                if (sourceFactory.Links[links].Distance < distance)
+                                {
+                                    source = sourceFactory;
+                                    distance = sourceFactory.Links[links].Distance;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    actions.Add(new BombGameAction(source, factory, distance));
+                }
+            }
+            actions.Sort(delegate (BombGameAction action1, BombGameAction action2) { return action2.Score.CompareTo(action1.Score); });
+            return actions[0];
         }
 
         private static void AddTroopsToFactory(List<Factory> updatedFactories, Troop troop)

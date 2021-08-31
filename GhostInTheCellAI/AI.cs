@@ -1,5 +1,4 @@
-﻿using GhostInTheCellAI.Extentions;
-using GhostInTheCellAI.Models;
+﻿using GhostInTheCellAI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,8 +50,16 @@ namespace GhostInTheCellAI
                     }
                 }
 
-                List<Factory> unavailableFactories = (from a in actions select a.Source).ToList();
-                List<GameAction> increaseProduction = _actionService.GetPossibleFactoryProductionIncrease(_game);
+                if (_game.RemainingBombs > 0)
+                {
+                    List<Factory> unavailableFactories = (from a in actions select a.Source).ToList();
+                    GameAction bombAction = _actionService.GetBombAction(_game, unavailableFactories);
+                    if (bombAction != null)
+                    {
+                        actions.Add(bombAction);
+                        _game.RemainingBombs -= 1;
+                    }
+                }
 
                 foreach (var a in actions)
                 {
@@ -62,8 +69,8 @@ namespace GhostInTheCellAI
                 //TODO Increaseroduction Action
                 //TODO bomb Defence
                 /*
+                List<GameAction> increaseProduction = _actionService.GetPossibleFactoryProductionIncrease(_game);
                  * 
-                GameAction bombAction = _actionService.GetPossibleBombAction(_game, unavailableFactories);
                 */
                 string action = String.Join(";", actions);
 

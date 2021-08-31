@@ -1,11 +1,11 @@
 ﻿namespace GhostInTheCellAI.Models
 {
-    public class BombMoveGameAction : GameAction
+    public class BombGameAction : GameAction
     {
         public override string Name() => "BOMB";
         public Factory Destination { get; private set; }
 
-        public BombMoveGameAction(Factory source, Factory destination, int distance)
+        public BombGameAction(Factory source, Factory destination, int distance)
         {
             Source = source;
             Destination = destination;
@@ -19,7 +19,7 @@
 
         public override string ToString()
         {
-            return $"{Name()} {Source} {Destination}";
+            return $"{Name()} {Source.Id} {Destination.Id}";
         }
         public override string WriteAction()
         {

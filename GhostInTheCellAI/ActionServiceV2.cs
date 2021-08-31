@@ -12,7 +12,7 @@ namespace GhostInTheCellAI
             // Things ot take into account:
             // 4. think about TTA of troops.
             List<Factory> updatedFactories = GetUpDatedFactoriesWithTroopsAtDestinationAndBombsSent(game);
-            List<MoveGameAction> gameActions = FindPossibleTakeOvers(updatedFactories);
+            List<MoveGameAction> gameActions = FindPossibleTakeOvers(updatedFactories, game);
 
             return gameActions;
         }
@@ -83,20 +83,20 @@ namespace GhostInTheCellAI
             }
         }
 
-        private static List<MoveGameAction> FindPossibleTakeOvers(List<Factory> factories)//TODO REfactor FindPossibleTakovers
+        private static List<MoveGameAction> FindPossibleTakeOvers(List<Factory> futureFactories, Game game)//TODO REfactor FindPossibleTakovers
         {
             List<MoveGameAction> possibleTakeOvers = new List<MoveGameAction>();
-            List<Factory> ownedFactories = factories.FindAll(fac => fac.Owner == Owner.Player);
+            List<Factory> ownedFactories = game.Factories.FindAll(fac => fac.Owner == Owner.Player);
 
             for (int i = 0; i < ownedFactories.Count; i++)
             {
-                Factory factory = ownedFactories[i];
+                Factory factory = futureFactories.First(F => F.Id == ownedFactories[i].Id);
                 int numberOfLinks = factory.Links.Count;
                 //Console.Error.WriteLine($"Owned factory = {factory}");
 
                 for (int links = 0; links < numberOfLinks; links++)
                 {
-                    Factory destinationFactory = GetDestinationFactory(factory, links);
+                    Factory destinationFactory = futureFactories.First(F => F.Id == GetDestinationFactory(factory, links).Id);
                     if (destinationFactory.Owner == Owner.Enemy)
                     {
                         int destinationCyborgs = destinationFactory.Cyborgs + (destinationFactory.Production * factory.Links[links].Distance);

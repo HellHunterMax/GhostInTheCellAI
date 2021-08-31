@@ -36,7 +36,7 @@ namespace GhostInTheCellAI
                 {
                     Console.Error.WriteLine(factory);
                 }
-                cyborgActions.Sort(delegate (MoveGameAction action1, MoveGameAction action2) { return action1.Score.CompareTo(action2.Score); });
+                cyborgActions.Sort(delegate (MoveGameAction action1, MoveGameAction action2) { return action2.Score.CompareTo(action1.Score); });
 
                 foreach (var cyborgAction in cyborgActions)
                 {
@@ -51,6 +51,9 @@ namespace GhostInTheCellAI
                     }
                 }
 
+                List<Factory> unavailableFactories = (from a in actions select a.Source).ToList();
+                List<GameAction> increaseProduction = _actionService.GetPossibleFactoryProductionIncrease(_game);
+
                 foreach (var a in actions)
                 {
                     Console.Error.WriteLine(a.WriteAction());
@@ -60,8 +63,6 @@ namespace GhostInTheCellAI
                 //TODO bomb Defence
                 /*
                  * 
-                List<Factory> unavailableFactories = (from a in actions select a.Source).ToList();
-                List<GameAction> increaseProduction = _actionService.GetPossibleFactoryProductionIncrease(_game);
                 GameAction bombAction = _actionService.GetPossibleBombAction(_game, unavailableFactories);
                 */
                 string action = String.Join(";", actions);

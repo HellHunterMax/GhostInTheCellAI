@@ -25,6 +25,7 @@ namespace GhostInTheCellAI.Models
             Score = ((Destination.Production * 100) / Distance) + Source.Cyborgs - Destination.Cyborgs;
         }
 
+        //DOTO IsPossible is wrong needs refactor.
         public bool IsPossible()
         {
             if (Destination.Owner == Owner.Player)
@@ -36,20 +37,6 @@ namespace GhostInTheCellAI.Models
             {
                 return true;
             }
-            /*
-             * Will always be false becouse cannot be < 0 anymore.
-            else
-            {
-                if (Destination.Cyborgs <= 0 && Source.Cyborgs > Math.Abs(Destination.Cyborgs))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            */
             return false;
         }
 
@@ -59,6 +46,11 @@ namespace GhostInTheCellAI.Models
             if (Destination.Owner == Owner.Enemy || Destination.Owner == Owner.Neutral)
             {
                 Destination.Cyborgs -= Cyborgs;
+                if (Destination.Cyborgs < 0)
+                {
+                    Destination.Owner = Owner.Player;
+                    Destination.Cyborgs = Math.Abs(Destination.Cyborgs);
+                }
             }
             else
             {

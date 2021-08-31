@@ -11,42 +11,39 @@ namespace GhostInTheCellAI
         {
             // Things ot take into account:
             // 4. think about TTA of troops.
-            UpDateFactoriesWithTroopsAtDestinationAndBombsSent(game);
-            List<MoveGameAction> gameActions = FindPossibleTakeOvers(game.Factories);
+            List<Factory> updatedFactories = GetUpDatedFactoriesWithTroopsAtDestinationAndBombsSent(game);
+            List<MoveGameAction> gameActions = FindPossibleTakeOvers(updatedFactories);
 
             return gameActions;
         }
 
 
-        private static void UpDateFactoriesWithTroopsAtDestinationAndBombsSent(Game game)
+        private static List<Factory> GetUpDatedFactoriesWithTroopsAtDestinationAndBombsSent(Game game)
         {
-            /*
             List<Factory> updatedFactories = new List<Factory>();
-
             foreach (var factory in game.Factories)
             {
                 updatedFactories.Add(new Factory()
                 {
+                    Cyborgs = factory.Cyborgs,
                     Id = factory.Id,
                     Links = factory.Links,
                     Owner = factory.Owner,
-                    Production = factory.Production,
-                    Cyborgs = factory.Cyborgs
+                    Production = factory.Production
                 });
             }
-            */
             foreach (var troop in game.Troops)
             {
-                AddTroopsToFactory(game.Factories, troop);
+                AddTroopsToFactory(updatedFactories, troop);
             }
             foreach (var bomb in game.Bombs)
             {
                 if (bomb.Owner == Owner.Player)
                 {
-                    UpdateFactoryForBomb(game.Factories, bomb);
+                    UpdateFactoryForBomb(updatedFactories, bomb);
                 }
             }
-            //return updatedFactories;
+            return updatedFactories;
         }
 
         private static void UpdateFactoryForBomb(List<Factory> updatedFactories, Bomb bomb)
@@ -65,11 +62,8 @@ namespace GhostInTheCellAI
             {
                 fac.Cyborgs -= 10;
             }
-            fac.Production = 0;
         }
 
-
-        //TODO change factory owner to who is owner with amount of cyborgs.
         private static void AddTroopsToFactory(List<Factory> updatedFactories, Troop troop)
         {
             var factory = updatedFactories.First(x => x.Id == troop.Destination.Id);

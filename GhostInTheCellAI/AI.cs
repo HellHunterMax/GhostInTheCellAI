@@ -1,6 +1,8 @@
-﻿using GhostInTheCellAI.Models;
+﻿using GhostInTheCellAI.Extentions;
+using GhostInTheCellAI.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GhostInTheCellAI
 {
@@ -9,7 +11,8 @@ namespace GhostInTheCellAI
         private readonly Game _game;
         private readonly ActionServiceV2 _actionService;
         //TODO add remaining turns into calculation.
-        //TODO split the calculate best action so you can get multiple actions.
+        //TODO refactor so you calculate factories for each new action so you can take TTA into account.
+        //TODO calculate if 2 factories together and take over.
         // To debug: Console.Error.WriteLine("Debug messages...");
 
         public AI(ActionServiceV2 actionService, Game game)
@@ -39,8 +42,12 @@ namespace GhostInTheCellAI
                 {
                     if (cyborgAction.IsPossible())
                     {
-                        actions.Add(cyborgAction);
-                        cyborgAction.PlayOut();
+                        Factory currentSourceFactory = _game.Factories.First(F => F.Id == cyborgAction.Source.Id);
+                        if (currentSourceFactory.Owner == Owner.Player)
+                        {
+                            actions.Add(cyborgAction);
+                            cyborgAction.PlayOut();
+                        }
                     }
                 }
 
@@ -52,8 +59,10 @@ namespace GhostInTheCellAI
                 //TODO Increaseroduction Action
                 //TODO bomb Defence
                 /*
-                GameAction bombAction = _actionService.GetPossibleBombAction(_game, unavailableFactories);
+                 * 
+                List<Factory> unavailableFactories = (from a in actions select a.Source).ToList();
                 List<GameAction> increaseProduction = _actionService.GetPossibleFactoryProductionIncrease(_game);
+                GameAction bombAction = _actionService.GetPossibleBombAction(_game, unavailableFactories);
                 */
                 string action = String.Join(";", actions);
 

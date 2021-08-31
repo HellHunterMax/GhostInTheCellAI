@@ -7,6 +7,7 @@ namespace GhostInTheCellAI.Models
 
         public int Cyborgs { get; set; }
         public Factory Destination { get; private set; }
+        public int CyborgsAfterProductionTime => Destination.Owner == Owner.Enemy ? Destination.Cyborgs + (Destination.Production * Distance) : Destination.Cyborgs;
 
         public override string Name() => "MOVE";
 
@@ -15,7 +16,7 @@ namespace GhostInTheCellAI.Models
             Source = source;
             Destination = destination;
             Distance = distance;
-            Cyborgs = Math.Abs(Destination.Cyborgs) + 1;
+            Cyborgs = CyborgsAfterProductionTime + 1;
             GiveScore();
         }
 
@@ -31,9 +32,7 @@ namespace GhostInTheCellAI.Models
                 return false;
             }
 
-            int destinationCyborgs = Destination.Owner == Owner.Enemy ? Destination.Cyborgs + (Destination.Production * Distance) : Destination.Cyborgs;
-
-            if (Source.Cyborgs > destinationCyborgs)
+            if (Source.Cyborgs > CyborgsAfterProductionTime)
             {
                 return true;
             }

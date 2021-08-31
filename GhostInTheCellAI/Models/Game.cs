@@ -16,8 +16,30 @@ namespace GhostInTheCellAI.Models
 
         public Game()
         {
-            BuildFactories();
         }
+
+        /*
+        public Game GetCopy()
+        {
+            Game game = new Game();
+
+            foreach (var factory in Factories)
+            {
+                game.Factories.Add(new Factory()
+                {
+                    Cyborgs = factory.Cyborgs,
+                    Id = factory.Id,
+                    Links = factory.Links,
+                    Owner = factory.Owner,
+                    Production = factory.Production
+                });
+            }
+            foreach (var troop in Troops)
+            {
+                game.Troops.Add(troop)
+            }
+        }
+        */
 
         public void UpdateGame()
         {
@@ -32,7 +54,7 @@ namespace GhostInTheCellAI.Models
                 if (entityType == "FACTORY")
                 {
                     Factory factory = Factories.First((fac => fac.Id == entityId));
-                    UpdateFactory(factory);
+                    UpdateFactory(factory, (Owner)int.Parse(_Inputs[2]), int.Parse(_Inputs[3]), int.Parse(_Inputs[4]));
                 }
                 else if (entityType == "TROOP")
                 {
@@ -62,13 +84,13 @@ namespace GhostInTheCellAI.Models
                 }
             }
         }
-        private void UpdateFactory(Factory factory)
+        private void UpdateFactory(Factory factory, Owner owner, int cyborgs, int production)
         {
-            factory.Owner = (Owner)int.Parse(_Inputs[2]);
-            factory.Cyborgs = int.Parse(_Inputs[3]);
-            factory.Production = int.Parse(_Inputs[4]);
+            factory.Owner = owner;
+            factory.Cyborgs = cyborgs;
+            factory.Production = production;
         }
-        private void BuildFactories()
+        public void BuildFactories()
         {
             int factoryCount = int.Parse(Console.ReadLine());
 

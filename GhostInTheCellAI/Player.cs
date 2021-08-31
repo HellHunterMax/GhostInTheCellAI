@@ -12,6 +12,7 @@ namespace GhostInTheCellAI
         static void Main(string[] args)
         {
             Game game = new Game();
+            game.BuildFactories();
             ActionServiceV2 actionService = new ActionServiceV2();
             AI ai = new AI(actionService, game);
             ai.Run();

@@ -107,8 +107,12 @@ namespace GhostInTheCellAI
                     actions.Add(new BombGameAction(source, factory, distance));
                 }
             }
-            actions.Sort(delegate (BombGameAction action1, BombGameAction action2) { return action2.Score.CompareTo(action1.Score); });
-            return actions[0];
+            if (actions.Any())
+            {
+                actions.Sort(delegate (BombGameAction action1, BombGameAction action2) { return action2.Score.CompareTo(action1.Score); });
+                return actions[0];
+            }
+            return null;
         }
 
         private static void AddTroopsToFactory(List<Factory> updatedFactories, Troop troop)

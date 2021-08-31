@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GhostInTheCellAI.Models
 {
@@ -25,22 +21,24 @@ namespace GhostInTheCellAI.Models
 
         private void GiveScore()
         {
-            Score = ((Destination.Production * 100) / Distance ) + Source.Cyborgs - Destination.Cyborgs;
+            Score = ((Destination.Production * 100) / Distance) + Source.Cyborgs - Destination.Cyborgs;
         }
 
         public bool IsPossible()
         {
-            if (Destination.Owner == Owner.Enemy || Destination.Owner == Owner.Neutral)
+            if (Destination.Owner == Owner.Player)
             {
-                if (Destination.Cyborgs >= 0 && Source.Cyborgs > Destination.Cyborgs)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
+
+            int destinationCyborgs = Destination.Owner == Owner.Enemy ? Destination.Cyborgs + (Destination.Production * Distance) : Destination.Cyborgs;
+
+            if (Source.Cyborgs > destinationCyborgs)
+            {
+                return true;
+            }
+            /*
+             * Will always be false becouse cannot be < 0 anymore.
             else
             {
                 if (Destination.Cyborgs <= 0 && Source.Cyborgs > Math.Abs(Destination.Cyborgs))
@@ -52,6 +50,8 @@ namespace GhostInTheCellAI.Models
                     return false;
                 }
             }
+            */
+            return false;
         }
 
         public void PlayOut()

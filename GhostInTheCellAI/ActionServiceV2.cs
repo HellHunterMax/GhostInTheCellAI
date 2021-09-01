@@ -81,10 +81,22 @@ namespace GhostInTheCellAI
             {
                 return null;
             }
+            int bombDestination = -1;
+            foreach (var bomb in game.Bombs)
+            {
+                if (bomb.Owner == Owner.Player)
+                {
+                    bombDestination = bomb.Destination.Id;
+                }
+            }
 
             foreach (var factory in updatedFactories)
             {
-                if (factory.Owner == Owner.Enemy && factory.Cyborgs > 20 && factory.Production >1)
+                if (factory.Id == bombDestination)
+                {
+                    continue;
+                }
+                if (factory.Owner == Owner.Enemy && factory.Production >1)
                 {
                     Factory source = PossibleSource[0];
                     int distance = int.MaxValue;
@@ -104,7 +116,11 @@ namespace GhostInTheCellAI
                             }
                         }
                     }
-                    actions.Add(new BombGameAction(source, factory, distance));
+                    var action = new BombGameAction(source, factory, distance);
+                    if (action.IsValid(game))
+                    {
+                        actions.Add(action);
+                    }
                 }
             }
             if (actions.Any())

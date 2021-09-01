@@ -20,6 +20,7 @@ namespace GhostInTheCellAI
             _actionService = actionService;
         }
 
+        //TODO decrese focus on 0 production factories.
         public void Run()
         {
             // game loop
@@ -65,7 +66,6 @@ namespace GhostInTheCellAI
                 {
                     Console.Error.WriteLine(a.WriteAction());
                 }
-                //TODO BombAction
                 //TODO Increaseroduction Action
                 //TODO bomb Defence
                 /*

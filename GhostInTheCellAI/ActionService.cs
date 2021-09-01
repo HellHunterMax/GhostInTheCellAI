@@ -123,7 +123,6 @@ namespace GhostInTheCellAI
 
         private Factory FindBombTarget(Game game)
         {
-            //TODO Check if bomb is already being sent.
             Factory target = null;
             foreach (var factory in game.Factories)
             {
@@ -133,7 +132,7 @@ namespace GhostInTheCellAI
                     {
                         target = factory;
                     }
-                    else if (target != null && factory.Production > 0 && factory.Cyborgs > target.Cyborgs)//TODO check if production is more the target.
+                    else if (target != null && factory.Production > 0 && factory.Cyborgs > target.Cyborgs)
                     {
                         target = factory;
                     }
@@ -182,8 +181,6 @@ namespace GhostInTheCellAI
             return factories;
         }
 
-
-        //TODO Add minuspoints for own owned factories. Removed for now.
         private static bool IsCurrentTargetBest(int cyborgsCurrent, int cyborgsChallenger, KeyValuePair<Factory, int> CurrentFactoryAndDistance, KeyValuePair<Factory, int> ChallengerFactoryAndDistance)
         {
             bool currentIsClosest = CurrentFactoryAndDistance.Value <= ChallengerFactoryAndDistance.Value;
@@ -225,7 +222,6 @@ namespace GhostInTheCellAI
             return answer;
         }
 
-        //TODO add troops to possibletakeovers
         private static Dictionary<Factory, Dictionary<Factory, int>> FindPossibleTakeOvers(List<Factory> ownedFactories)
         {
             Dictionary<Factory, Dictionary<Factory, int>> possibleTakeOvers = new Dictionary<Factory, Dictionary<Factory, int>>();

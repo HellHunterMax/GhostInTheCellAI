@@ -71,6 +71,7 @@ namespace GhostInTheCellAI
             List<Factory> PossibleSource = new List<Factory>();
             foreach (var factory in game.Factories)
             {
+                Console.Error.WriteLine($"unavailableFactories.Any = {unavailableFactories.Any(f => f.Id == factory.Id)} factory.Owner = {factory.Owner}");
                 if (factory.Owner == Owner.Player && !unavailableFactories.Any(f => f.Id == factory.Id))
                 {
                     PossibleSource.Add(factory);
@@ -104,11 +105,12 @@ namespace GhostInTheCellAI
                     {
                         for (int links = 0; links < sourceFactory.Links.Count; links++)
                         {
-                            Factory destinationFactory = updatedFactories.First(F => F.Id == GetDestinationFactory(factory, links).Id);
+                            Factory destinationFactory = updatedFactories.First(F => F.Id == GetDestinationFactory(sourceFactory, links).Id);
                             if (destinationFactory == factory)
                             {
                                 if (sourceFactory.Links[links].Distance < distance)
                                 {
+                                    Console.Error.WriteLine($"distance = {sourceFactory.Links[links].Distance} old distance = {distance}");
                                     source = sourceFactory;
                                     distance = sourceFactory.Links[links].Distance;
                                 }
@@ -150,6 +152,8 @@ namespace GhostInTheCellAI
             }
         }
 
+
+        //TODO change when to takeover factories (neutral)
         private static List<MoveGameAction> FindPossibleTakeOvers(List<Factory> futureFactories, Game game)//TODO REfactor FindPossibleTakovers
         {
             List<MoveGameAction> possibleTakeOvers = new List<MoveGameAction>();
@@ -164,7 +168,7 @@ namespace GhostInTheCellAI
                 for (int links = 0; links < numberOfLinks; links++)
                 {
                     Factory destinationFactory = futureFactories.First(F => F.Id == GetDestinationFactory(factory, links).Id);
-                    if (destinationFactory.Owner == Owner.Enemy)
+                    if (destinationFactory.Owner == Owner.Enemy && destinationFactory.Production > 0)
                     {
                         int destinationCyborgs = destinationFactory.Cyborgs + (destinationFactory.Production * factory.Links[links].Distance);
                         if (destinationCyborgs > 0 && factory.Cyborgs > destinationCyborgs)
@@ -172,7 +176,7 @@ namespace GhostInTheCellAI
                             possibleTakeOvers.Add(new MoveGameAction(factory, destinationFactory, factory.Links[links].Distance));
                         }
                     }
-                    else if (destinationFactory.Owner == Owner.Neutral)
+                    else if (destinationFactory.Owner == Owner.Neutral && destinationFactory.Production > 0)
                     {
                         if (factory.Cyborgs > destinationFactory.Cyborgs)
                         {

@@ -25,7 +25,8 @@ namespace GhostInTheCellAI.Models
             Score = ((Destination.Production * 100) / Distance) + Source.Cyborgs - Destination.Cyborgs;
         }
 
-        //DOTO IsPossible is wrong needs refactor.
+        //TODO IsPossible is wrong needs refactor.
+        //TODO add Validation
         public bool IsPossible()
         {
             if (Destination.Owner == Owner.Player)

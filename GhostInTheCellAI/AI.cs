@@ -11,7 +11,7 @@ namespace GhostInTheCellAI
         private readonly ActionServiceV2 _actionService;
         //TODO add remaining turns into calculation.
         //TODO refactor so you calculate factories for each new action so you can take TTA into account.
-        //TODO calculate if 2 factories together and take over.
+        //TODO calculate if 2 factories together can take over.
         // To debug: Console.Error.WriteLine("Debug messages...");
 
         public AI(ActionServiceV2 actionService, Game game)
@@ -20,7 +20,7 @@ namespace GhostInTheCellAI
             _actionService = actionService;
         }
 
-        //TODO decrese focus on 0 production factories.
+        //TODO send units closer to enemy.
         public void Run()
         {
             // game loop
@@ -54,6 +54,7 @@ namespace GhostInTheCellAI
                 if (_game.RemainingBombs > 0)
                 {
                     List<Factory> unavailableFactories = (from a in actions select a.Source).ToList();
+                    Console.Error.WriteLine(unavailableFactories.Count);
                     GameAction bombAction = _actionService.GetBombAction(_game, unavailableFactories);
                     if (bombAction != null)
                     {

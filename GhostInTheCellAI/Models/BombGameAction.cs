@@ -4,6 +4,7 @@
     {
         public override string Name() => "BOMB";
         public Factory Destination { get; private set; }
+        public int Distance { get; private set; }
 
         public BombGameAction(Factory source, Factory destination, int distance)
         {

@@ -9,10 +9,9 @@ namespace GhostInTheCellAI.Models
     public class IncreaseGameAction : GameAction
     {
         public override string Name() => "INC";
-        public IncreaseGameAction(Factory source, int distance)
+        public IncreaseGameAction(Factory source)
         {
             Source = source;
-            Distance = distance;
             GiveScore();
         }
         public void GiveScore()
@@ -45,7 +44,7 @@ namespace GhostInTheCellAI.Models
         }
         public override string WriteAction()
         {
-            return $"{Name()} Source={Source.Id} Score={Score} Distance={Distance}";
+            return $"{Name()} Source={Source.Id} Score={Score}";
         }
     }
 }

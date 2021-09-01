@@ -9,7 +9,7 @@ namespace GhostInTheCellAI
 {
     public class ActionService
     {
-        public string CalculateBestAction(Game game)
+        public static string CalculateBestAction(Game game)
         {
             string action = "WAIT";
 
@@ -121,7 +121,7 @@ namespace GhostInTheCellAI
             return new Factory[] { source, destination };
         }
 
-        private Factory FindBombTarget(Game game)
+        private static Factory FindBombTarget(Game game)
         {
             Factory target = null;
             foreach (var factory in game.Factories)

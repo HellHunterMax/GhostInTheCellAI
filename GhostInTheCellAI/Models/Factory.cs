@@ -20,7 +20,7 @@ namespace GhostInTheCellAI.Models
     public class Factory
     {
         public int Id { get; set; }
-        public List<Link> Links { get; set; } = new();
+        public List<Link> Links { get; set; } = new List<Link>();
         public int Production { get; set; }
         public int Cyborgs { get; set; }
         public Owner Owner { get; set; }

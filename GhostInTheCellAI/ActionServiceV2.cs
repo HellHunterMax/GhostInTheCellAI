@@ -132,6 +132,116 @@ namespace GhostInTheCellAI
             return null;
         }
 
+        internal List<IncreaseGameAction> GetPossibleFactoryProductionIncrease(Game game)
+        {
+            //Factory cyborgs > 10
+            List<Factory> ownedFactories = GetPlayerFactories(game);
+            List<Factory> ownedFactoriesWhoCanIncrease = ownedFactories.FindAll(x => x.Cyborgs > 9 && x.Production < 3);
+
+            Console.Error.WriteLine($"Factories who can increse = {ownedFactoriesWhoCanIncrease.Count}");
+            if (!ownedFactoriesWhoCanIncrease.Any())
+            {
+                return null;
+            }
+
+            Factory farthestFactory = null;
+            GetFurthestFactory(out farthestFactory, ownedFactoriesWhoCanIncrease, game);
+            int closestDistance = 0;
+            Factory closestFactory = null;
+            GetClosestFactory(out closestFactory, out closestDistance, ownedFactories, game);
+
+            Console.Error.WriteLine($"farthestFactory = {farthestFactory}, closestFactory = {closestFactory}");
+            if (farthestFactory == null || closestFactory == null)
+            {
+                return null;
+            }
+            List<IncreaseGameAction> actions = new List<IncreaseGameAction>();
+
+            if (CanIncrease(game, closestDistance))
+            {
+                foreach (var factory in ownedFactoriesWhoCanIncrease)
+                {
+                    actions.Add(new IncreaseGameAction(factory));
+                }
+            }
+
+            // All my Cyborgs + prod * minimum time (farthest) > all their cyborgs. then you may upgrade.
+            //Get farthest factory.
+            //Calculate
+            //upgrade.
+            return actions;
+        }
+
+        /// <summary>
+        /// This calculates if you can increase a Factory.
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="closestDistance"></param>
+        /// <returns></returns>
+        private static bool CanIncrease(Game game, int closestDistance)
+        {
+            int myCyborgsCount = 0;
+            int enemyCyborgsCount = 0;
+
+            foreach (var factory in game.Factories)
+            {
+                if (factory.Owner == Owner.Enemy)
+                {
+                    enemyCyborgsCount += factory.Cyborgs;
+                }
+                else if (factory.Owner == Owner.Player)
+                {
+                    myCyborgsCount += factory.Cyborgs + (factory.Production * closestDistance);
+                }
+            }
+
+            Console.Error.WriteLine($"myCyborgsCount - 10 > enemyCyborgsCount = {myCyborgsCount - 10 > enemyCyborgsCount}");
+
+            if (myCyborgsCount - 10 > enemyCyborgsCount)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private static void GetClosestFactory(out Factory closestFactory, out int closestDistance, List<Factory> factories, Game game)
+        {
+            closestFactory = null;
+            closestDistance = int.MaxValue;
+            foreach (var playerFactory in factories)
+            {
+                for (int links = 0; links < playerFactory.Links.Count; links++)
+                {
+                    Factory destinationFactory = game.Factories.First(F => F.Id == GetDestinationFactory(playerFactory, links).Id);
+                    int dist = playerFactory.Links[links].Distance;
+                    if (destinationFactory.Owner == Owner.Enemy && dist < closestDistance)
+                    {
+                        closestDistance = dist;
+                        closestFactory = destinationFactory;
+                    }
+                }
+            }
+        }
+
+        private static void GetFurthestFactory(out Factory farthestFactory, List<Factory> factories, Game game)
+        {
+            farthestFactory = null;
+            int FurthestDistance = 0;
+            foreach (var playerFactory in factories)
+            {
+                for (int links = 0; links < playerFactory.Links.Count; links++)
+                {
+                    Factory destinationFactory = game.Factories.First(F => F.Id == GetDestinationFactory(playerFactory, links).Id);
+                    int dist = playerFactory.Links[links].Distance;
+                    if (destinationFactory.Owner == Owner.Enemy && dist > FurthestDistance)
+                    {
+                        FurthestDistance = dist;
+                        farthestFactory = destinationFactory;
+                    }
+                }
+            }
+        }
+
         private static void AddTroopsToFactory(List<Factory> updatedFactories, Troop troop)
         {
             var factory = updatedFactories.First(x => x.Id == troop.Destination.Id);
@@ -156,7 +266,7 @@ namespace GhostInTheCellAI
         private static List<MoveGameAction> FindPossibleTakeOvers(List<Factory> futureFactories, Game game)//TODO REfactor FindPossibleTakovers
         {
             List<MoveGameAction> possibleTakeOvers = new List<MoveGameAction>();
-            List<Factory> ownedFactories = game.Factories.FindAll(fac => fac.Owner == Owner.Player);
+            List<Factory> ownedFactories = GetPlayerFactories(game);
 
             for (int i = 0; i < ownedFactories.Count; i++)
             {
@@ -195,6 +305,12 @@ namespace GhostInTheCellAI
             }
             return possibleTakeOvers;
         }
+
+        private static List<Factory> GetPlayerFactories(Game game)
+        {
+            return game.Factories.FindAll(fac => fac.Owner == Owner.Player);
+        }
+
         private static Factory GetDestinationFactory(Factory factory, int linknumber)
         {
 

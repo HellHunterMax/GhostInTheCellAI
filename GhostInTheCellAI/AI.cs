@@ -28,10 +28,17 @@ namespace GhostInTheCellAI
             {
                 _game.UpdateGame();
 
+                foreach (var troop in _game.Troops)
+                {
+                    Console.Error.WriteLine(troop);
+                }
+
                 List<GameAction> actions = new List<GameAction>();
 
                 List<MoveGameAction> cyborgActions = _actionService.GetPossibleCyborgActions(_game);
 
+                Console.Error.WriteLine();
+                Console.Error.WriteLine("Current Factories");
                 foreach (var factory in _game.Factories)
                 {
                     Console.Error.WriteLine(factory);
@@ -67,12 +74,20 @@ namespace GhostInTheCellAI
                 {
                     Console.Error.WriteLine(a.WriteAction());
                 }
+
+                if (!actions.Any())
+                {
+                    List<IncreaseGameAction> increaseProduction = _actionService.GetPossibleFactoryProductionIncrease(_game);
+                    if (increaseProduction.Any())
+                    {
+                        increaseProduction.Sort(delegate (IncreaseGameAction action1, IncreaseGameAction action2) { return action2.Score.CompareTo(action1.Score); });
+                        actions.Add(increaseProduction[0]);
+                    }
+
+                }
                 //TODO Increaseroduction Action
                 //TODO bomb Defence  HOW TO: Save factories that have TTA for bomb and when its about to hit send to other factory.
                 /*
-                 * 
-                 * 
-                List<GameAction> increaseProduction = _actionService.GetPossibleFactoryProductionIncrease(_game);
                  * 
                 */
                 string action = String.Join(";", actions);

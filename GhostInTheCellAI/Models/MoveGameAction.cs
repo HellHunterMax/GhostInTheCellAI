@@ -7,6 +7,7 @@ namespace GhostInTheCellAI.Models
 
         public int Cyborgs { get; set; }
         public Factory Destination { get; private set; }
+        public int Distance { get; private set; }
         public int CyborgsAfterProductionTime => Destination.Owner == Owner.Enemy ? Destination.Cyborgs + (Destination.Production * Distance) : Destination.Cyborgs;
 
         public override string Name() => "MOVE";

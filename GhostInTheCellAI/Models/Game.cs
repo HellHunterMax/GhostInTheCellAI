@@ -18,29 +18,6 @@ namespace GhostInTheCellAI.Models
         {
         }
 
-        /*
-        public Game GetCopy()
-        {
-            Game game = new Game();
-
-            foreach (var factory in Factories)
-            {
-                game.Factories.Add(new Factory()
-                {
-                    Cyborgs = factory.Cyborgs,
-                    Id = factory.Id,
-                    Links = factory.Links,
-                    Owner = factory.Owner,
-                    Production = factory.Production
-                });
-            }
-            foreach (var troop in Troops)
-            {
-                game.Troops.Add(troop)
-            }
-        }
-        */
-
         public void UpdateGame()
         {
             int entityCount = int.Parse(Console.ReadLine());
@@ -105,7 +82,7 @@ namespace GhostInTheCellAI.Models
                 _Inputs = Console.ReadLine().Split(' ');
                 Factory factory1 = Factories.First(fac => fac.Id == int.Parse(_Inputs[0]));
                 Factory factory2 = Factories.First(fac => fac.Id == int.Parse(_Inputs[1]));
-                int distance = int.Parse(_Inputs[2]);
+                int distance = int.Parse(_Inputs[2]) + 1;
 
                 Link link = new Link()
                 {

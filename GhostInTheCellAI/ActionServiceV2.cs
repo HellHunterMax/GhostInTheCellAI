@@ -7,6 +7,7 @@ namespace GhostInTheCellAI
 {
     public class ActionServiceV2
     {
+        //TODO some factories take longer to reach ?
         private List<Factory> updatedFactories;
         public List<MoveGameAction> GetPossibleCyborgActions(Game game)
         {
@@ -71,7 +72,6 @@ namespace GhostInTheCellAI
             List<Factory> PossibleSource = new List<Factory>();
             foreach (var factory in game.Factories)
             {
-                Console.Error.WriteLine($"unavailableFactories.Any = {unavailableFactories.Any(f => f.Id == factory.Id)} factory.Owner = {factory.Owner}");
                 if (factory.Owner == Owner.Player && !unavailableFactories.Any(f => f.Id == factory.Id))
                 {
                     PossibleSource.Add(factory);
@@ -110,7 +110,6 @@ namespace GhostInTheCellAI
                             {
                                 if (sourceFactory.Links[links].Distance < distance)
                                 {
-                                    Console.Error.WriteLine($"distance = {sourceFactory.Links[links].Distance} old distance = {distance}");
                                     source = sourceFactory;
                                     distance = sourceFactory.Links[links].Distance;
                                 }

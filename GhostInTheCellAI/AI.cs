@@ -68,8 +68,10 @@ namespace GhostInTheCellAI
                     Console.Error.WriteLine(a.WriteAction());
                 }
                 //TODO Increaseroduction Action
-                //TODO bomb Defence
+                //TODO bomb Defence  HOW TO: Save factories that have TTA for bomb and when its about to hit send to other factory.
                 /*
+                 * 
+                 * 
                 List<GameAction> increaseProduction = _actionService.GetPossibleFactoryProductionIncrease(_game);
                  * 
                 */

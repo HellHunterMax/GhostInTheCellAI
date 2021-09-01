@@ -16,5 +16,10 @@ namespace GhostInTheCellAI.Models
         public Factory Destination { get; set; }
         public int Size { get; set; }
         public int TurnsToArrive { get; set; }
+
+        public override string ToString()
+        {
+            return $"Source = {Source.Id}, Destination = {Destination.Id}, TTA = {TurnsToArrive}, SIZE = {Size}, Destination Cyborgs ={Destination.Cyborgs}";
+        }
     }
 }
